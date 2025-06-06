@@ -15,7 +15,7 @@ const multiOptions = [
   { value: "narrative", label: "Narrative" },
 ];
 
-const backendUrl = "http://127.0.0.1:8000";
+const backendUrl = "https://fastapipython-e58y.onrender.com";
 
 interface UploadComponentProps {
   uploadedFile: File | null;

@@ -21,7 +21,6 @@ const PPTtoImage: React.FC = () => {
   );
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
 
-  // comments is an array of arrays of Comment objects, one array per slide
   const [comments, setComments] = useState<Comment[][]>([]);
   const [newComment, setNewComment] = useState<string>("");
 
@@ -33,7 +32,6 @@ const PPTtoImage: React.FC = () => {
       timestamp: new Date().toISOString(),
     };
 
-    // Update comments state immutably for current slide
     const updatedSlideComments = [
       ...(comments[currentSlideIndex] || []),
       commentObj,
@@ -91,8 +89,25 @@ const PPTtoImage: React.FC = () => {
         setIsProcessing={setIsProcessing}
       />
 
+      {/* Slide navigation boxes */}
+      <div className="mt-4 flex justify-center space-x-2">
+        {slideImages.length > 0 && // Only show the navigation buttons if there are slides
+          slideImages.map((_, index) => (
+            <button
+              key={index}
+              className={`px-4 py-2 rounded-full text-white bg-blue-500 hover:bg-blue-600 ${
+                currentSlideIndex === index ? "bg-blue-700" : ""
+              }`}
+              onClick={() => setCurrentSlideIndex(index)}
+            >
+              {index + 1}
+            </button>
+          ))}
+      </div>
+
+      {/* Display the current slide */}
       {slideImages.length > 0 && (
-        <div className="flex flex-1 space-x-4 overflow-hidden">
+        <div className="flex flex-1 space-x-4 overflow-hidden mt-6">
           <FirstColumn
             slideImage={slideImages[currentSlideIndex]}
             currentSlideIndex={currentSlideIndex}
@@ -107,65 +122,6 @@ const PPTtoImage: React.FC = () => {
             setNewComment={setNewComment}
             onCommentSubmit={handleCommentSubmit}
           />
-        </div>
-      )}
-
-      {slideImages.length > 0 && (
-        <div className="mt-4 flex justify-between">
-          <button
-            onClick={() =>
-              setCurrentSlideIndex((prev) => Math.max(prev - 1, 0))
-            }
-            disabled={currentSlideIndex === 0}
-            className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-          >
-            ← Prev
-          </button>
-          <button
-            onClick={() =>
-              setCurrentSlideIndex((prev) =>
-                Math.min(prev + 1, slideImages.length - 1)
-              )
-            }
-            disabled={currentSlideIndex === slideImages.length - 1}
-            className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-          >
-            Next →
-          </button>
-          <button
-            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-            onClick={async () => {
-              try {
-                const response = await fetch(
-                  `${backendUrl}/download-corrected-ppt`,
-                  {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                      correctedSlides: correctedSlideImages,
-                    }),
-                  }
-                );
-
-                if (!response.ok) {
-                  throw new Error(`Download failed: ${response.statusText}`);
-                }
-
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const link = document.createElement("a");
-                link.href = url;
-                link.setAttribute("download", "corrected_presentation.pptx");
-                document.body.appendChild(link);
-                link.click();
-                link.remove();
-              } catch (error) {
-                alert(`Download error: ${(error as Error).message}`);
-              }
-            }}
-          >
-            Submit & Download
-          </button>
         </div>
       )}
     </div>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import Select from "react-select";
 import JSZip from "jszip";
 
@@ -51,7 +51,6 @@ const UploadComponent: React.FC<UploadComponentProps> = ({
   setCorrectedSlideImages,
   setComments,
   setCurrentSlideIndex,
-  error,
   setError,
   isProcessing,
   setIsProcessing,
